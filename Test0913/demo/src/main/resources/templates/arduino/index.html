@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        div {
+            display: flex;
+            justify-content: left;
+        }
+    </style>
+</head>
+<body>
+<fieldset style="width: 250px">
+
+<div>
+    <span>
+<fieldset style="width:100px; margin: 5px">
+<input class="com_port">
+<button class="conn_btn">연결</button>
+</fieldset>
+
+<fieldset style="width:100px; margin: 5px ">
+<button class="led_on">LED On</button>
+<button class="led_off">LED Off</button>
+</fieldset>
+    </span>
+
+
+    <span>
+    <fieldSet style="width:100px">
+        <legend>점등 상태</legend>
+        <span class="led_info"></span>
+    </fieldSet>
+
+    <fieldSet style="width:100px">
+        <legend>온도</legend>
+        <span class="tmp_info"></span>
+    </fieldSet>
+
+    <fieldSet style="width:100px">
+        <legend>조도</legend>
+        <span class="light-info"></span>
+    </fieldSet>
+
+    <fieldSet style="width:100px">
+        <legend>거리</legend>
+        <span class="distancs_info"></span>
+    </fieldSet>
+</span>
+</div>
+
+</fieldset>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.5.0/axios.min.js"
+        integrity="sha512-aoTNnqZcT8B4AmeCFmiSnDlc4Nj/KPaZyB5G7JnOnUEkdNpCZs1LCankiYi01sLTyWy+m2P+W4XM+BuQ3Q4/Dg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+    const led_on_btn = document.querySelector('.led_on');
+    const led_off_btn = document.querySelector('.led_off');
+
+    const led_info_el = document.querySelector('.led_info');
+    const tmp_info_el = document.querySelector('.tmp_info');
+    const light_info_el = document.querySelector('.light-info');
+    const distance_info_el = document.querySelector('.distancs_info');
+
+    const conn_btn = document.querySelector('.conn_btn');
+
+    conn_btn.addEventListener('click', function () {
+
+        const port = document.querySelector('.com_port').value;
+
+        axios.get(`/arduino/connection/${port}`)
+            .then(response => {
+                //연결에 성공했다면 요청
+                setInterval(() => {
+                    req_led_info_func();
+                    req_tmp_info_func();
+                    req_light_info_func();
+                    req_distance_info_func();
+
+                }, 1000)
+            })
+            .catch(error => {
+            });
+    });
+
+    led_on_btn.addEventListener('click', function () {
+        axios.get('/arduino/led/1')
+            .then(response => {
+            })
+            .catch(error => {
+            });
+    });
+    led_off_btn.addEventListener('click', function () {
+        axios.get('/arduino/led/0')
+            .then(response => {
+            })
+            .catch(error => {
+            });
+    });
+
+    //----------------------------------------------------------------
+    //Message Received Interval Function
+    //----------------------------------------------------------------
+
+    const req_led_info_func = () => {
+        axios.get('http://localhost:8080/arduino/message/led')
+            .then(response => {
+                led_info_el.innerHTML = response.data;
+            })
+            .catch(error => {
+            });
+    }
+    const req_tmp_info_func = () => {
+        axios.get('http://localhost:8080/arduino/message/tmp')
+            .then(response => {
+                tmp_info_el.innerHTML = response.data;
+            })
+            .catch(error => {
+            });
+    }
+    const req_light_info_func = () => {
+        axios.get('http://localhost:8080/arduino/message/light')
+            .then(response => {
+                light_info_el.innerHTML = response.data;
+            })
+            .catch(error => {
+            });
+    }
+    const req_distance_info_func = () => {
+        axios.get('http://localhost:8080/arduino/message/distance')
+            .then(response => {
+                distance_info_el.innerHTML = response.data;
+            })
+            .catch(error => {
+            });
+    }
+
+
+</script>
+
+
+</body>
+</html>
